@@ -8,7 +8,9 @@ var express = require('express'),
     app=express();
 var ObjectID = require('mongodb').ObjectID;
 
-
+app.get('/',function(req,res){
+    res.redirect("/videojuegos/llista");
+});
 
 
 app.get('/videojuegos/llista', function(req, res){
@@ -29,7 +31,7 @@ app.get('/videojuegos/llista', function(req, res){
                   </thead>\
                   <tbody>';
             docs.forEach(function(doc){
-                console.log(doc.title);
+                console.log(doc.nombre);
                 var tr_id="<tr><td>"+doc._id+"</td>";
                 var tr_nombre="<td>"+doc.nombre+"</td>";
                 var tr_plataforma="<td>"+doc.plataforma+"</td>";
@@ -37,7 +39,7 @@ app.get('/videojuegos/llista', function(req, res){
 
                 id_juego = doc._id;
 
-                botonEditar = "<td><a class='btn btn-link' href=http://localhost:3000/videojuegos/borrar/"+id_juego+">Editar</a></td>";
+                botonEditar = "<td><a class='btn btn-link' href=http://localhost:3000/videojuegos/editar/"+id_juego+">Editar</a></td>";
                 botonBorrar = "<td><a class='btn btn-link' href=http://localhost:3000/videojuegos/borrar/"+id_juego+">Borrar</a></td>";
 
                 var fin_tr="</tr>";
@@ -99,7 +101,7 @@ app.post('/videojuegos/crear',urlencodedParser, function(req, res){
         var myobj = { nombre: inputNombre, plataforma: inputPlataforma, añoLanzamiento: inputLanzamiento};
         dbo.collection("videojuegos").insertOne(myobj, function(err, res) {
             if (err) throw err;
-            console.log("Nuevo dato insertado");
+            console.log("Nuevo Elemento Insertado");
             db.close();
         });       
 
@@ -124,6 +126,69 @@ app.get('/videojuegos/borrar/:id',function(req,res){
         res.redirect("/videojuegos/llista");
 
     });
+});
+
+
+
+
+app.get('/videojuegos/editar/:id',function(req,res){
+    var idJuego = req.params.id;
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("videojuegos");
+        dbo.collection('videojuegos').findOne({_id: new ObjectID(idJuego)},function(err, docs){
+
+            var formularioModificar = '<form method="POST" action="http://localhost:3000/videojuegos/editar/'+[idJuego]+'">\
+            <label for="nombre">Nombre del Juego</label>\
+            <input class="form-control" type="text" name="nombre" value="'+docs["nombre"]+'">\
+            <br>\
+            <label for="duracion">Plataforma</label>\
+            <input class="form-control" type="text" name="plataforma" value="'+docs["plataforma"]+'">\
+            <br>\
+            <label for="descripcion">Año de lanzamiento</label>\
+            <input class="form-control" type="text" name="lanzamiento" value="'+docs["añoLanzamiento"]+'">\
+            <br>\
+            <input type="submit">\
+            </form>';
+            fs.readFile("head.html","utf8",(err,data)=>{
+                if(err){
+                    console.log(err);
+                    return err;
+                }else{
+                    res.send(data+formularioModificar);
+                }
+            })
+
+
+        });
+    });
+});
+
+
+
+
+app.post('/videojuegos/editar/:id',urlencodedParser,function(req,res){
+    var idJuego = req.params.id;
+
+    var inputNombre = req.body.nombre;
+    var inputPlataforma = req.body.plataforma;
+    var inputLanzamiento = req.body.lanzamiento;
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+            var dbo = db.db("videojuegos");
+        var jsquery = {_id: new ObjectID(idJuego)};
+            var newvalues = { $set: { nombre: inputNombre, plataforma: inputPlataforma, añoLanzamiento: inputLanzamiento} };
+            dbo.collection('videojuegos').updateOne(jsquery, newvalues, function(err, result){
+
+                console.log("Nuevo Elemento Modificado");
+                res.redirect("/");
+    
+            }); 
+        
+        });
+
 });
 
 
