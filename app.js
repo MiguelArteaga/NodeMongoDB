@@ -12,7 +12,6 @@ app.get('/',function(req,res){
     res.redirect("/videojuegos/llista");
 });
 
-
 app.get('/videojuegos/llista', function(req, res){
     MongoClient.connect(url, function(err, db){
         assert.equal(null, err);
@@ -20,7 +19,7 @@ app.get('/videojuegos/llista', function(req, res){
         var dbo = db.db("videojuegos");
         dbo.collection('videojuegos').find({}).toArray(function(err, docs){
             var listaInicial ="";
-            var listaTabla= '<table class="table">\
+            var listaTabla= '<table class="table table-dark">\
                   <thead>\
                     <tr>\
                       <th scope="col">ID</th>\
@@ -39,8 +38,8 @@ app.get('/videojuegos/llista', function(req, res){
 
                 id_juego = doc._id;
 
-                botonEditar = "<td><a class='btn btn-link' href=http://localhost:3000/videojuegos/editar/"+id_juego+">Editar</a></td>";
-                botonBorrar = "<td><a class='btn btn-link' href=http://localhost:3000/videojuegos/borrar/"+id_juego+">Borrar</a></td>";
+                botonEditar = "<td><a class='btn btn-warning' href=http://localhost:3000/videojuegos/editar/"+id_juego+">Editar</a></td>";
+                botonBorrar = "<td><a class='btn btn-warning' href=http://localhost:3000/videojuegos/borrar/"+id_juego+">Borrar</a></td>";
 
                 var fin_tr="</tr>";
                 var listaContenido=tr_id+tr_nombre+tr_plataforma+tr_lanzamiento+botonEditar+botonBorrar+fin_tr;
@@ -49,7 +48,7 @@ app.get('/videojuegos/llista', function(req, res){
             var finalTabla ='</tbody>\
                             </table>';
 
-            var botonCrear = '<a  class="btn btn-primary"  href="http://localhost:3000/videojuegos/crear" >Crear<a/>';
+            var botonCrear = '<a  class="btn btn-danger"  href="http://localhost:3000/videojuegos/crear" >Crear<a/>';
             var tablaFinal = listaTabla+listaInicial+finalTabla+botonCrear;
             fs.readFile("head.html","utf8",(err,data)=>{
                 if(err){
@@ -76,7 +75,7 @@ app.get('/videojuegos/crear',function(req,res){
         <label for="descripcion">Año de lanzamiento</label>\
         <input class="form-control" type="text" name="lanzamiento">\
         <br>\
-        <input type="submit">\
+        <input class="btn btn-success" value="Crear" type="submit">\
     </form>';
     fs.readFile("head.html","utf8",(err,data)=>{
         if(err){
@@ -149,7 +148,7 @@ app.get('/videojuegos/editar/:id',function(req,res){
             <label for="descripcion">Año de lanzamiento</label>\
             <input class="form-control" type="text" name="lanzamiento" value="'+docs["añoLanzamiento"]+'">\
             <br>\
-            <input type="submit">\
+            <input class="btn btn-success" value="Guardar" type="submit">\
             </form>';
             fs.readFile("head.html","utf8",(err,data)=>{
                 if(err){
