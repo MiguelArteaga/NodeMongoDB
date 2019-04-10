@@ -8,10 +8,14 @@ var express = require('express'),
     app=express();
 var ObjectID = require('mongodb').ObjectID;
 
+
+//ruta para dirigir a la vista de listado de videojuegos
 app.get('/',function(req,res){
     res.redirect("/videojuegos/llista");
 });
 
+
+//vista listado de videojuegos
 app.get('/videojuegos/llista', function(req, res){
     MongoClient.connect(url, function(err, db){
         assert.equal(null, err);
@@ -48,7 +52,7 @@ app.get('/videojuegos/llista', function(req, res){
             var finalTabla ='</tbody>\
                             </table>';
 
-            var botonCrear = '<a  class="btn btn-danger"  href="http://localhost:3000/videojuegos/crear" >Crear<a/>';
+            var botonCrear = '<a  class="btn btn-warning centro"  href="http://localhost:3000/videojuegos/crear" >Crear<a/>';
             var tablaFinal = listaTabla+listaInicial+finalTabla+botonCrear;
             fs.readFile("head.html","utf8",(err,data)=>{
                 if(err){
@@ -63,7 +67,7 @@ app.get('/videojuegos/llista', function(req, res){
     });
 });
 
-
+//vista donde se muestra el formulario para poder crear un nuevo videojuego
 app.get('/videojuegos/crear',function(req,res){
     var formularioInsertar = '<form method="POST">\
         <label for="nombre">Nombre del Juego</label>\
@@ -87,7 +91,7 @@ app.get('/videojuegos/crear',function(req,res){
     })
 });
 
-
+//componente donde cogemos los valores de los inputs del formulario de la vista crear y los añadimos a la base de datos
 app.post('/videojuegos/crear',urlencodedParser, function(req, res){
     var inputNombre = req.body.nombre;
     var inputPlataforma = req.body.plataforma;
@@ -111,7 +115,7 @@ app.post('/videojuegos/crear',urlencodedParser, function(req, res){
 });
 
 
-
+//componente para borrar una videojuego
 app.get('/videojuegos/borrar/:id',function(req,res){
     var idJuego = req.params.id;
         
@@ -129,7 +133,7 @@ app.get('/videojuegos/borrar/:id',function(req,res){
 
 
 
-
+//vista del formulario de editar videojuego, consultamos los datos del videojuego para mostrarlos en los inputs
 app.get('/videojuegos/editar/:id',function(req,res){
     var idJuego = req.params.id;
 
@@ -166,7 +170,7 @@ app.get('/videojuegos/editar/:id',function(req,res){
 
 
 
-
+//componente de editar donde recogemos los nuevos valores del input y los guardamos en la base de datos
 app.post('/videojuegos/editar/:id',urlencodedParser,function(req,res){
     var idJuego = req.params.id;
 
